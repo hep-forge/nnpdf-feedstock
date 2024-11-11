@@ -1,0 +1,74 @@
+{% set versions = {
+    "4.0.9": "843a03d88e884e1eecedf84c213cb0e5659e9cd4"
+} %}
+
+{% set version = environ.get('COMMIT_VERSION', None) %}
+{% set version = version or versions.keys()|first %}
+{% set version = version|string %}
+
+package:
+  name: {{ environ.get('ANACONDA_PACKAGE', "nnpdf")|string|lower }}
+  version: {{ environ.get('ANACONDA_VERSION', version)|replace("-", ".") }}
+
+source:
+  git_url: https://github.com/NNPDF/nnpdf
+  git_rev: {{ versions.get(version) or "HEAD" }}
+
+build:
+    noarch: python
+    script: {{ PYTHON }} -m pip install . -vv
+    number: 0
+    detect_binary_files_with_prefix: True
+
+requirements:
+    host:
+        - python >=3.9,<3.13
+        - poetry-core >=1.0.0
+        - poetry-dynamic-versioning >=1.2.0
+        - pip
+    run:
+        - python >=3.9,<3.13
+        - tensorflow >=2.10,<2.17 # 2.17 works ok but the conda-forge package for macos doesn't
+        - psutil # to ensure n3fit affinity is with the right processors
+        - hyperopt
+        - mongodb
+        - pymongo <4
+        - seaborn
+        - lhapdf
+        - numpy
+        - pkg-config
+#        - reportengine
+        - matplotlib >=3.3.0,<3.8  # see https://github.com/NNPDF/nnpdf/pull/1809
+        - blessings >=1.7
+        - scipy >=0.19.1
+        - pandas
+        - requests
+        - prompt_toolkit
+        - validobj
+        - pineappl >=0.8.2
+        - eko >=0.14.2
+        - fiatlux
+        - sphinx >=5.0.2
+        - joblib
+        - sphinx_rtd_theme >0.5
+        - sphinxcontrib-bibtex
+        - ruamel.yaml <0.18
+
+test:
+    requires:
+        - hypothesis
+        - pytest
+        - coverage
+        - pytest-mpl
+
+    source_files:
+        - "*"
+
+about:
+    home: https://nnpdf.mi.infn.it/
+    license: GPLv3.0
+    summary: "NNPDF analysis framework"
+
+extra:
+  recipe-maintainers:
+    - meiyasan
