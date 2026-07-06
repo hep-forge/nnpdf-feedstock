@@ -19,6 +19,11 @@ build:
     script: {{ PYTHON }} -m pip install . -vv
     number: 0
     detect_binary_files_with_prefix: True
+    # fiatlux has never had an aarch64 build on conda-forge, and nnpdf's
+    # required tensorflow range (<2.17) predates conda-forge's first
+    # aarch64 tensorflow build (2.18.0) -- unsolvable on that arch. The
+    # noarch package built on amd64 already covers every platform.
+    skip: true  # [aarch64]
 
 requirements:
     host:
